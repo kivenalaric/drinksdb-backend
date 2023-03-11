@@ -1,29 +1,39 @@
 const express = require("express");
-const Drink = require("../database/drinks");
+const bcrypt = require("bcrypt");
+const uuid = require('uuid');
 
+const Drink = require("../database/drinks");
 const User = require("../database/users");
+
+const { SALT_ROUNDS } = require("../services/constants");
+const { authMiddleware } = require("../services/auth")
 
 const router = express.Router();
 
 router.get("/", async function (_, res) {
-  const users = await User.findAll();
+  const users = await User.findAll({include: Drink});
   res.send(users);
 });
 
-router.post("/", async function (req, res) {
-  const { firstName, lastName, emailAddress, phone, password, adminUser } =
-    req.body;
-  const user = await User.create({
-    firstName,
-    lastName,
-    emailAddress,
-    phone,
-    password,
-    adminUser,
-    apiKey: Date.now(),
-  });
-  res.send(user);
-});
+router.post("/", authMiddleware, function (req, res) {
+    const { firstName, lastName, emailAddress, phone, password } = req.body;
+    bcrypt.hash(password, +SALT_ROUNDS, async function(err, hash) {
+        if(err){
+            res.status(500).send(err);
+        } else {
+            const user = await User.create({
+            firstName,
+            lastName,
+            emailAddress,
+            phone,
+            password: hash,
+            apiKey: uuid.v4(),
+            })
+            re.send(user);
+        }
+    })
+    
+})
 
 router.get("/:id", async function (req, res) {
   const user = await User.findByPk(req.params.id, { include: Drink });
