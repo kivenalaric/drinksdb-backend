@@ -15,7 +15,7 @@ router.get("/", async function (_, res) {
   res.send(users);
 });
 
-router.post("/", authMiddleware, function (req, res) {
+router.post("/", function (req, res) {
     const { firstName, lastName, emailAddress, phone, password } = req.body;
     bcrypt.hash(password, +SALT_ROUNDS, async function(err, hash) {
         if(err){
@@ -24,12 +24,12 @@ router.post("/", authMiddleware, function (req, res) {
             const user = await User.create({
             firstName,
             lastName,
-            emailAddress,
+            emailAddress, 
             phone,
             password: hash,
             apiKey: uuid.v4(),
             })
-            re.send(user);
+            res.send(user);
         }
     })
     
