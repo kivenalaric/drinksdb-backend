@@ -1,67 +1,126 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - emailAddress
+ *         - password
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the book
+ *         firstName:
+ *           type: string
+ *           description: The firstName of the user
+ *         lastName:
+ *           type: string
+ *           description: The lasttName of the user
+ *         emailAddress:
+ *           type: string
+ *           description: The password of the user
+ *         password:
+ *           type: string
+ *           description: The password of the user
+ *         adminUser:
+ *           type: boolean
+ *           description: Whether you have finished reading the book
+ *         createdAt:
+ *           type: string
+ *           format: date
+ *           description: The date the book was added
+ *         updatedAt:
+ *           type: string
+ *           format: date
+ *           description: The date the book was updated
+ *       example:
+ *         id: 1
+ *         firstName: Rash
+ *         lastName: Lahfen
+ *         emailAddress: rash237@gmail.com
+ *         adminUser: false
+ *         password: rashking
+ *         createdAt: 2020-03-10T04:05:06.157Z
+ *         updatedAt: 2020-03-10T04:05:06.157Z
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The users managing API
+ * /users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The created user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Some server error
+ *
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The users managing API
+ * /users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The created user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Some server error
+ *
+ */
+
 const express = require("express");
-const bcrypt = require("bcrypt");
-const uuid = require('uuid');
+// const bcrypt = require("bcrypt");
+// const uuid = require('uuid');
+const UserController = require('../Controllers/UserControllers')
+
 
 const Drink = require("../database/drinks");
 const User = require("../database/users");
-
-const { SALT_ROUNDS } = require("../services/constants");
-const { authMiddleware } = require("../services/auth")
+// const { authMiddleware } = require("../services/auth")
 
 const router = express.Router();
 
-router.get("/", async function (_, res) {
-  const users = await User.findAll({include: Drink});
-  res.send(users);
-});
+router.get("/", UserController.findAll);
 
-router.post("/", function (req, res) {
-    const { firstName, lastName, emailAddress, phone, password } = req.body;
-    bcrypt.hash(password, +SALT_ROUNDS, async function(err, hash) {
-        if(err){
-            res.status(500).send(err);
-        } else {
-            const user = await User.create({
-            firstName,
-            lastName,
-            emailAddress, 
-            phone,
-            password: hash,
-            apiKey: uuid.v4(),
-            })
-            res.send(user);
-        }
-    })
-    
-})
+router.post("/", UserController.createUser)
 
-router.get("/:id", async function (req, res) {
-  const user = await User.findByPk(req.params.id, { include: Drink });
-  if (user) {
-    res.send(user);
-  }
-  res.send({ message: "No such user Found" });
-});
+router.get("/:id", UserController.getOneUser);
 
-router.put("/:id", async function (req, res) {
-  const { firstName, lastName, emailAddress, phone, password } = req.body;
-  if (firstName && lastName && emailAddress && phone && password) {
-    await User.update(req.body, { where: { id: req.params.id } });
-    const user = await findByPk(req.params.id);
-    res.send(user);
-  }
-  res.send({ message: "Write Error" });
-});
+router.put("/:id", UserController.putOneUser);
 
-router.patch("/:id", async function (req, res) {
-  await User.update(req.body, { where: { id: req.params.id } });
-  const user = await User.findByPk(req.params.id);
-  res.send(user);
-});
+router.patch("/:id", UserController.patchOnUser);
 
-router.delete("/:id", async function (req, res) {
-  await User.destroy({ where: { id: req.params.id } });
-  res.send({ message: "Operation successful" });
-});
+router.delete("/:id", UserController.deleteUser);
 
 module.exports = router;

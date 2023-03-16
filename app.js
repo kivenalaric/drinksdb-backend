@@ -4,7 +4,10 @@ const path = require('path');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const swaggerUi = require("swagger-ui-express");
+// const swaggerJsdoc = require("swagger-jsdoc");
 const dotEnv = require("dotenv");
+const specs = require('./services/swagger')
 dotEnv.config()
 
 const indexRouter = require('./routes/index');
@@ -37,6 +40,12 @@ app.use('/drinks', drinksRouter);
 app.use('/glasses', glassRouter);
 app.use('/ingredients', ingredientsRouter);
 app.use('/categories', categoriesRouter);
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

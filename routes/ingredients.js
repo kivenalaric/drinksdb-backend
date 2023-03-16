@@ -1,49 +1,18 @@
 const express = require("express");
-const Ingredient = require("../database/ingredients");
+// const Ingredient = require("../database/ingredients");
 const router = express.Router();
+const IngredientControllers = require('../Controllers/IngredientControllers');
 
-router.get("/", async function (_, res) {
-  const categories = await Ingredient.findAll();
-  res.send(categories);
-});
+router.get("/", IngredientControllers.getAllIngredients);
 
-router.post("/", async function (req, res) {
-  const { name, description } = req.body;
-  const ingredient = await Ingredient.create({
-    name, description
-  });
-  res.send(ingredient);
-});
+router.post("/", IngredientControllers.createIngredient);
 
-router.get("/:id", async function (req, res) {
-  const ingredient = await Ingredient.findByPk(req.params.id);
-  if(ingredient){
-    res.send(ingredient)
-  } else {
-  res.send({message: "No such ingredient Found"})
-};
-});
+router.get("/:id",IngredientControllers.getOneIngredient );
 
-router.put("/:id", async function (req, res) {
-  const { name, description  } = req.body;
-  if ((name && description)) {
-    await Ingredient.update(req.body, {where: {id : req.params.id}});
-    const ingredient = await Ingredient.findByPk(req.params.id);
-    res.send(ingredient);
-  } else {
-    res.send({ message: "Write Error" });
-  }
-});
+router.put("/:id", IngredientControllers.putOneIngredient);
 
-router.patch("/:id", async function (req, res) {
-  await Ingredient.update(req.body,  {where: { id: req.params.id }});
-  const ingredient = await Ingredient.findByPk(req.params.id);
-  res.send(ingredient);
-});
+router.patch("/:id", IngredientControllers.patchOnIngredient);
 
-router.delete("/:id", async function (req, res) {
-  await Ingredient.destroy( {where: {id: req.params.id}});
-  res.send({ message: "Operation successful" });
-});
+router.delete("/:id",IngredientControllers.deleteOneIngredient );
 
 module.exports = router;

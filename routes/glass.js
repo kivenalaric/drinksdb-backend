@@ -1,49 +1,18 @@
 const express = require("express");
-const Glass = require("../database/glass");
+// const Glass = require("../database/glass");
 const router = express.Router();
+const GlassControllers = require('../Controllers/GlassControllers')
 
-router.get("/", async function (_, res) {
-  const glasses = await Glass.findAll();
-  res.send(glasses);
-});
+router.get("/", GlassControllers.getAllGlasses);
 
-router.post("/", async function (req, res) {
-  const { name } = req.body;
-  const glass = await Glass.create({
-    name
-  });
-  res.send(glass);
-});
+router.post("/", GlassControllers.createGlass);
 
-router.get("/:id", async function (req, res) {
-  const glass = await Glass.findByPk(req.params.id);
-    if(glass){
-    res.send(glass)
-    } else {
-    res.send({message: "No such glass Found"});
-   }
-});
+router.get("/:id", GlassControllers.getOneGlass);
 
-router.put("/:id", async function (req, res) {
-    const { name } = req.body;
-    if ((name)) {
-      await Glass.update(req.body, {where: {id : req.params.id}});
-      const glass = await Glass.findByPk(req.params.id);
-      res.send(glass);
-    } else {
-        res.send({ message: "Write Error" });
-    }
-  });
+router.put("/:id", GlassControllers.putOneGlass);
 
-router.patch("/:id", async function (req, res) {
-  await Glass.update(req.body,  {where: { id: req.params.id }});
-  const glass = await Glass.findByPk(req.params.id);
-  res.send(glass);
-});
+router.patch("/:id", GlassControllers.patchOnGlass);
 
-router.delete("/:id", async function (req, res) {
-  await Glass.destroy( {where: {id: req.params.id}});
-  res.send({ message: "Operation successful" });
-});
+router.delete("/:id", GlassControllers.deleteOneGlass);
 
 module.exports = router;

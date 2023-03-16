@@ -1,49 +1,18 @@
 const express = require("express");
-const Drink = require("../database/drinks");
+// const Drink = require("../database/drinks");
 const router = express.Router();
+const DrinkControllers = require('../Controllers/DrinkControllers');
 
-router.get("/", async function (_, res) {
-  const drinks = await Drink.findAll();
-  res.send(drinks);
-});
+router.get("/", DrinkControllers.getAllDrinks);
 
-router.post("/", async function (req, res) {
-  const { name, imageUrl, description, recipe } = req.body;
-  const drink = await Drink.create({
-    name, description, imageUrl, recipe
-  });
-  res.send(drink);
-});
+router.post("/", DrinkControllers.createDrink);
 
-router.get("/:id", async function (req, res) {
-  const drink = await Drink.findByPk(req.params.id);
-  if(drink){
-    res.send(drink)
-  } else {
-  res.send({message: "No such drink Found"})
-};
-});
+router.get("/:id", DrinkControllers.getOneDrink);
 
-router.put("/:id", async function (req, res) {
-  const { name, imageUrl, description, recipe } = req.body;
-  if ((name && imageUrl && description && recipe)) {
-    await Drink.update(req.body, {where: {id : req.params.id}});
-    const drink = await Drink.findByPk(req.params.id);
-    res.send(drink);
-  } else {
-    res.send({ message: "Write Error" });
-  }
-});
+router.put("/:id", DrinkControllers.putOneDrink);
 
-router.patch("/:id", async function (req, res) {
-  await Drink.update(req.body,  {where: { id: req.params.id }});
-  const drink = await Drink.findByPk(req.params.id);
-  res.send(drink);
-});
+router.patch("/:id", DrinkControllers.patchOnDrink);
 
-router.delete("/:id", async function (req, res) {
-  await Drink.destroy( {where: {id: req.params.id}});
-  res.send({ message: "Operation successful" });
-});
+router.delete("/:id", DrinkControllers.deleteDrink);
 
 module.exports = router;
