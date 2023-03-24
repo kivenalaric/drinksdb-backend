@@ -209,20 +209,21 @@ const UserController = require('../Controllers/UserControllers')
 
 const Drink = require("../database/drinks");
 const User = require("../database/users");
+const { authMiddleware, authorizeByIsAdmin, authorizeByApiKey } = require("../services/auth");
 // const { authMiddleware } = require("../services/auth")
 
 const router = express.Router();
 
-router.get("/", UserController.findAll);
+router.get("/", authMiddleware, authorizeByApiKey, UserController.findAll);
 
 router.post("/", UserController.createUser)
 
-router.get("/:id", UserController.getOneUser);
+router.get("/:id", authMiddleware, authorizeByApiKey, UserController.getOneUser);
 
-router.put("/:id", UserController.putOneUser);
+router.put("/:id",authMiddleware, authorizeByIsAdmin, UserController.putOneUser);
 
-router.patch("/:id", UserController.patchOnUser);
+router.patch("/:id",authMiddleware, authorizeByIsAdmin, UserController.patchOnUser);
 
-router.delete("/:id", UserController.deleteUser);
+router.delete("/:id", authMiddleware, authorizeByIsAdmin, UserController.deleteUser);
 
 module.exports = router;

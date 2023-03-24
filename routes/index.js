@@ -33,11 +33,11 @@ router.post("/login", async (req, res) => {
               }
         })
     };
-  });
+});
   
-  router.get("/current-user", authMiddleware, (req, res) => {
-    res.send(req.user);
-  });
+router.get("/current-user", authMiddleware, (req, res) => {
+  res.send(req.user);
+});
 
 
 module.exports = router;
